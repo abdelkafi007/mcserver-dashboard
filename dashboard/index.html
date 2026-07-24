@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minecraft Server Control Panel</title>
+    <link rel="stylesheet" href="style.v2.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Login Screen -->
+    <div id="login-screen" class="login-container">
+        <div class="login-box">
+            <h2>Admin Login</h2>
+            <p>Please enter your password to access the console.</p>
+            <form id="login-form">
+                <input type="password" id="login-password" placeholder="Password" required>
+                <button type="submit" class="btn btn-save" id="btn-login">Login</button>
+            </form>
+            <div id="login-error" class="login-error"></div>
+        </div>
+    </div>
+
+    <div class="dashboard-container" id="dashboard-main" style="display: none;">
+
+        <header>
+            <h1>Minecraft Server Panel</h1>
+            <div style="display: flex; gap: 1rem; align-items: center;">
+                <div class="status-indicator">
+                    <span id="status-dot" class="dot offline"></span>
+                    <span id="status-text">Status: Checking...</span>
+                </div>
+                <button id="btn-logout" class="btn btn-sm btn-stop" style="padding: 0.4rem 0.8rem;">Logout</button>
+            </div>
+        </header>
+
+        <nav class="tabs">
+            <button class="tab-btn active" data-tab="console">Console & Controls</button>
+            <button class="tab-btn" data-tab="mods">Mods</button>
+            <button class="tab-btn" data-tab="config">Configuration</button>
+        </nav>
+
+        <div class="tab-content active" id="tab-console">
+            <section class="controls">
+                <button id="btn-start" class="btn btn-start">Start Server</button>
+                <button id="btn-stop" class="btn btn-stop">Stop Server</button>
+                <button id="btn-restart" class="btn btn-restart">Restart Server</button>
+            </section>
+
+            <section class="terminal">
+                <div class="terminal-output" id="terminal-output">
+                    <div class="log-line system">Ready to send commands...</div>
+                </div>
+                <form id="command-form" class="command-input-container">
+                    <span class="prompt-symbol">&gt;</span>
+                    <input type="text" id="command-input" placeholder="Enter server command (e.g., list, say hello)..." autocomplete="off">
+                    <button type="submit" class="btn btn-send">Send</button>
+                </form>
+            </section>
+        </div>
+
+        <div class="tab-content" id="tab-mods">
+            <section class="mods-container">
+                <div class="dropzone" id="mod-dropzone">
+                    <div class="dropzone-text">Drag & Drop .jar files here to upload</div>
+                    <div class="dropzone-subtext">or click to browse</div>
+                    <input type="file" id="mod-file-input" accept=".jar" style="display: none;">
+                </div>
+                
+                <div class="mods-list-header">
+                    <h3>Installed Mods</h3>
+                    <button class="btn btn-sm btn-refresh" id="btn-refresh-mods">Refresh</button>
+                </div>
+                <div class="mods-list" id="mods-list">
+                    <div class="loading-text">Loading mods...</div>
+                </div>
+            </section>
+        </div>
+
+        <div class="tab-content" id="tab-config">
+            <section class="config-container">
+                <form id="config-form" class="config-form">
+                    <div class="form-group">
+                        <label for="prop-motd">Server MOTD</label>
+                        <input type="text" id="prop-motd" name="motd" placeholder="A Minecraft Server">
+                    </div>
+                    <div class="form-group">
+                        <label for="prop-difficulty">Difficulty</label>
+                        <select id="prop-difficulty" name="difficulty">
+                            <option value="peaceful">Peaceful</option>
+                            <option value="easy">Easy</option>
+                            <option value="normal">Normal</option>
+                            <option value="hard">Hard</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="prop-max-players">Max Players</label>
+                        <input type="number" id="prop-max-players" name="max-players" min="1" max="1000" placeholder="20">
+                    </div>
+                    <div class="form-group">
+                        <label for="prop-gamemode">Game Mode</label>
+                        <select id="prop-gamemode" name="gamemode">
+                            <option value="survival">Survival</option>
+                            <option value="creative">Creative</option>
+                            <option value="adventure">Adventure</option>
+                            <option value="spectator">Spectator</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="prop-view-distance">View Distance</label>
+                        <input type="number" id="prop-view-distance" name="view-distance" min="5" max="32" placeholder="10">
+                    </div>
+                    <div class="form-group toggle-group">
+                        <label for="prop-pvp">Player vs Player (PvP)</label>
+                        <label class="switch">
+                            <input type="checkbox" id="prop-pvp" name="pvp">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div class="form-group toggle-group">
+                        <label for="prop-whitelist">Enforce White-list</label>
+                        <label class="switch">
+                            <input type="checkbox" id="prop-whitelist" name="white-list">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="whitelist-management">
+                        <label for="whitelist-username">Whitelist Management</label>
+                        <div class="whitelist-input-group">
+                            <input type="text" id="whitelist-username" placeholder="Player Username" autocomplete="off">
+                            <button type="button" class="btn btn-sm btn-save" id="btn-whitelist-add">Add</button>
+                            <button type="button" class="btn btn-sm btn-stop" id="btn-whitelist-remove">Remove</button>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-sm btn-refresh" id="btn-refresh-config">Reload</button>
+                        <div class="right-actions">
+                            <button type="button" class="btn btn-stop" id="btn-restart-world" onclick="document.getElementById('modal-confirm-world-restart').classList.remove('hidden')">Restart World</button>
+                            <button type="submit" class="btn btn-save" id="btn-save-config">Save Settings</button>
+                        </div>
+                    </div>
+                    <div id="config-status" class="config-status"></div>
+                </form>
+            </section>
+        </div>
+    </div>
+    
+    <!-- World Restart Modal -->
+    <div id="modal-confirm-world-restart" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h3>Restart World</h3>
+            <p>Are you sure? This will permanently delete the current world.</p>
+            <div class="modal-actions">
+                <button type="button" id="modal-cancel-btn" class="btn btn-refresh" onclick="document.getElementById('modal-confirm-world-restart').classList.add('hidden')">Cancel</button>
+                <button type="button" id="modal-confirm-btn" class="btn btn-stop">Confirm Restart</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.v2.js"></script>
+</body>
+</html>
+
